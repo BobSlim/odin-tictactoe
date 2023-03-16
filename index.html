@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <style>
+      * {
+          box-sizing: border-box;
+      }
+
+      body {
+          margin: 0;
+          height: 100vh;
+          justify-content: center;
+          align-items: center;
+          display: flex;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background-color: khaki;
+      }
+
+      main {
+          width: 360px;
+          height: 800px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+      }
+
+      h1 {
+          margin-top: 0
+      }
+
+      ul {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+      }
+
+      li {
+          display: flex;
+          flex-direction: column;
+          margin: 0;
+      }
+
+      .gamepanel {
+          --symbol-size: 4rem;
+          width: 360px;
+          height: 800px;
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+          padding: 0.5rem;
+      }
+
+      .playerpanel {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+      }
+
+      .playerpanel_name{
+        font-size: var(--symbol-size);
+        width: 100%;
+      }
+
+      .playerpanel_symbol{
+        font-size: var(--symbol-size);
+      }
+
+      .gameboard {
+          aspect-ratio: 1 / 1;
+          --tictactoe_gapsize: 0.5rem;
+          display: grid;
+          grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+          background-color: darkkhaki;
+          gap: var(--tictactoe_gapsize);
+          padding: var(--tictactoe_gapsize);
+          border-radius: 0.5rem;
+      }
+      .gamecell {
+          border-radius: 0.5rem;
+          background-color: khaki;
+          font-size: var(--symbol-size);
+          font-weight: 1000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+      }
+
+      .gamecell:disabled{
+        color: inherit;
+      }
+    </style>
+</head>
+
+<body>
+  <main>
+    <div class="gamepanel">
+      <ul class="playerpanel">
+        <li>
+          <label for="player2_name">Name</label>
+          <input class="playerpanel_name" type="text" name="" id="player2_name" placeholder="Player2" value="Player2">
+        </li>
+        <li>
+          <label for="player2_symbol">Symbol</label>
+          <input size="1" maxlength="1" class="playerpanel_symbol" type="text" name="" id="player2_symbol"  placeholder="O" value="O">
+        </li>
+      </ul>
+      <div class="gameboard">
+        <button class="gamecell"></button>
+        <button class="gamecell"></button>
+        <button class="gamecell"></button>
+        <button class="gamecell"></button>
+        <button class="gamecell"></button>
+        <button class="gamecell"></button>
+        <button class="gamecell"></button>
+        <button class="gamecell"></button>
+        <button class="gamecell"></button>
+      </div>
+      <ul class="playerpanel">
+        <li>
+          <label for="player1_name">Name</label>
+          <input class="playerpanel_name" type="text" name="" id="player1_name" placeholder="Player1" value="Player1">
+        </li>
+        <li>
+          <label for="player1_symbol">Symbol</label>
+          <input size="1" maxlength="1" class="playerpanel_symbol" type="text" name="" id="player1_symbol" placeholder="X" value="X">
+        </li>
+      </ul>
+    </div>
+  </main>
+</body>
+
+<script defer>      
+  const gamecellFactory = (gamecellHTML) => {
+    let playerClaim;
+    const coordinates = {
+      y: 0,
+      x: 0
+    }
+    const handleClaim = (player) => {      
+      gamecellHTML.setAttribute('disabled', 'true')
+      playerClaim = player
+      gamecellHTML.innerText = playerClaim.symbol;
+    }
+    return {gamecellHTML, playerClaim, handleClaim}
+  }
+  const playerFactory = (name, symbol, playerHTML, num) => {
+
+    return {name, symbol, num}
+  }
+  //IIFE
+  const gameboard = (() => {
+    let currentPlayer = 0;
+    let players;
+    let turnCount = 0;
+    let firstTurn;
+    const playerClaim = (cell) => {
+      if(players == undefined){players = initPlayers()}
+      if(turnCount == 0){firstTurn = currentPlayer};
+      cell.handleClaim(players[currentPlayer]);
+      currentPlayer == 0 ? currentPlayer = 1 : currentPlayer = 0;
+      turnCount++
+      if (turnCount >= 4) {
+        checkWin(cell)
+      } else if(turnCount == 8){
+        draw()
+      }
+    }
+    const checkWin = (cell) => {
+      gameGrid[x][0]
+      gameGrid[0][y]
+
+      gameGrid[0][0]
+      gameGrid[1][1] //x=y
+      gameGrid[2][2]
+
+      gameGrid[0][2]
+      gameGrid[1][1] //x=2-y
+      gameGrid[2][0]
+    }
+    const gameCells = [...document.getElementsByClassName("gamecell")].map(element => gamecellFactory(element));
+    gameCells.forEach(element => {
+      element.gamecellHTML.addEventListener('click', () => playerClaim(element))
+    });
+    //IIFE
+    const gridifyCells = (cells) => {
+      const coords = {y: 0, x: 0};
+      const grid_init = [[],[],[]]
+      gameCells.forEach(element => {
+        element.coordinates = {...coords};
+        grid_init[coords.y][coords.x] = element;
+        coords.x++
+        if(coords.x >= 3){coords.y++; coords.x=0};
+      });
+      return grid_init;
+    }
+
+    const gameGrid = gridifyCells(gameCells)
+    console.log(gameGrid)
+  })()
+
+  const initPlayers = () => {    
+    const playerPanels = [...document.querySelectorAll('.playerpanel')]
+    const players = []
+    playerPanels.forEach(element => {
+      const HTML_name = element.querySelector('.playerpanel_name');
+      const HTML_symbol = element.querySelector('.playerpanel_symbol');
+      const name = HTML_name.value;
+      const symbol = HTML_symbol.value;
+      
+      const newHTML = document.createElement('span')
+      newHTML.classList.add('playerpanel_name')
+      newHTML.classList.add('playerpanel')
+      newHTML.innerText = `${name} - ${symbol}`
+
+      element.replaceWith(newHTML);
+
+      players.push(playerFactory(name, symbol, element))
+    });
+    return players.reverse();
+  }
+</script>
+
+</html>
