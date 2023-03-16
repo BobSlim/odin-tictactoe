@@ -139,21 +139,24 @@
 
 <script defer>      
   const gamecellFactory = (gamecellHTML) => {
-    let playerClaim;
+    let playerClaim = 'init';
     const coordinates = {
       y: 0,
       x: 0
     }
-    const handleClaim = (player) => {      
+    const handleClaim = (player) => {
       gamecellHTML.setAttribute('disabled', 'true')
-      playerClaim = player
-      gamecellHTML.innerText = playerClaim.symbol;
+      gamecellHTML.innerText = player.symbol;
+      playerClaim = player;
     }
-    return {gamecellHTML, playerClaim, handleClaim}
+    const getClaim = () =>{
+      return playerClaim;
+    }
+    const cell = {gamecellHTML, getClaim, handleClaim}
+    return cell
   }
-  const playerFactory = (name, symbol, playerHTML, num) => {
-
-    return {name, symbol, num}
+  const playerFactory = (name, symbol, playerHTML) => {
+    return {name, symbol}
   }
   //IIFE
   const gameboard = (() => {
@@ -162,49 +165,55 @@
     let turnCount = 0;
     let firstTurn;
     const playerClaim = (cell) => {
-      if(players == undefined){players = initPlayers()}
+      if(players == undefined){players = initPlayers()};
       if(turnCount == 0){firstTurn = currentPlayer};
       cell.handleClaim(players[currentPlayer]);
       currentPlayer == 0 ? currentPlayer = 1 : currentPlayer = 0;
       turnCount++
       if (turnCount >= 4) {
-        checkWin(gameGrid, cell)
+        console.log(checkWin(gameGrid, cell))
       } else if(turnCount == 8){
-        draw()
+        console.log('draw!')
       }
     }
     const checkWin = (grid, cell) => {
       const coords = cell.coordinates
-      const player = cell.playerClaim
-      const winning = []
+      const player = cell.getClaim()
+      const winning = {horzwin: false, vertwin: false, diagwin: false}
 
-      for (let x = 0; x < grid[coords.y].length; x++) {
-        const element = grid[coords.y][x];
-        if(element.playerClaim !== player){break;};
-        winning.push('Horizontal Win')
+      horzcheck: {
+        for (let x = 0; x < grid[coords.y].length; x++) {
+          const element = grid[coords.y][x];
+          if(element.getClaim() !== player){break horzcheck};
+        }
+        winning.horzwin = true
       }
 
-      for (let y = 0; y < grid.length; y++) {
-        const element = grid[y][coords.x];
-        if(element.playerClaim !== player){break;};
-        winning.push('Vertical Win') 
+      vertcheck: {
+        for (let y = 0; y < grid.length; y++) {
+          const element = grid[y][coords.x];
+          if(element.getClaim() !== player){break vertcheck;};
+        }
+        winning.vertwin = true
       }
 
       //on diag
       if(coords.y == coords.x){
-        for (let y = 0; y < grid.length; y++) {
+        diagcheck: {for (let y = 0; y < grid.length; y++) {
           const element = grid[y][y];
-          if(element.playerClaim !== player){break;};
-          winning.push('Diagonal Win') 
+          if(element.getClaim() !== player){break diagcheck;};
+        }
+        winning.diagwin = true;
         }
       }
 
       //on anti-diag
       if(coords.y == coords.x - 2){
-        for (let y = 0; y < grid.length; y++) {
+        adiagcheck: {for (let y = 0; y < grid.length; y++) {
           const element = grid[y][2-y];
-          if(element.playerClaim !== player){break;};
-          winning.push('Diagonal Win') 
+          if(element.getClaim() !== player){break adiagcheck;};
+        }
+        winning.diagwin = true;
         }
       }
 
