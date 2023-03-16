@@ -168,22 +168,47 @@
       currentPlayer == 0 ? currentPlayer = 1 : currentPlayer = 0;
       turnCount++
       if (turnCount >= 4) {
-        checkWin(cell)
+        checkWin(gameGrid, cell)
       } else if(turnCount == 8){
         draw()
       }
     }
-    const checkWin = (cell) => {
-      gameGrid[y][0]
-      gameGrid[0][x]
+    const checkWin = (grid, cell) => {
+      const coords = cell.coordinates
+      const player = cell.playerClaim
+      const winning = []
 
-      gameGrid[0][0]
-      gameGrid[1][1] //y=x
-      gameGrid[2][2]
+      for (let x = 0; x < grid[coords.y].length; x++) {
+        const element = grid[coords.y][x];
+        if(element.playerClaim !== player){break;};
+        winning.push('Horizontal Win')
+      }
 
-      gameGrid[0][2]
-      gameGrid[1][1] //y=2-x
-      gameGrid[2][0]
+      for (let y = 0; y < grid.length; y++) {
+        const element = grid[y][coords.x];
+        if(element.playerClaim !== player){break;};
+        winning.push('Vertical Win') 
+      }
+
+      //on diag
+      if(coords.y == coords.x){
+        for (let y = 0; y < grid.length; y++) {
+          const element = grid[y][y];
+          if(element.playerClaim !== player){break;};
+          winning.push('Diagonal Win') 
+        }
+      }
+
+      //on anti-diag
+      if(coords.y == coords.x - 2){
+        for (let y = 0; y < grid.length; y++) {
+          const element = grid[y][2-y];
+          if(element.playerClaim !== player){break;};
+          winning.push('Diagonal Win') 
+        }
+      }
+
+    return winning;
     }
     const gameCells = [...document.getElementsByClassName("gamecell")].map(element => gamecellFactory(element));
     gameCells.forEach(element => {
