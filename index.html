@@ -73,6 +73,10 @@
         font-size: var(--symbol-size);
       }
 
+      .currentTurn{
+        background-color: darkkhaki
+      }
+
       .gameboard {
           aspect-ratio: 1 / 1;
           --tictactoe_gapsize: 0.5rem;
@@ -81,7 +85,6 @@
           background-color: darkkhaki;
           gap: var(--tictactoe_gapsize);
           padding: var(--tictactoe_gapsize);
-          border-radius: 0.5rem;
       }
       .gamecell {
           border-radius: 0.5rem;
@@ -123,7 +126,7 @@
         <button class="gamecell"></button>
         <button class="gamecell"></button>
       </div>
-      <ul class="playerpanel">
+      <ul class="playerpanel currentTurn">
         <li>
           <label for="player1_name">Name</label>
           <input class="playerpanel_name" type="text" name="" id="player1_name" placeholder="Player1" value="Player1">
@@ -156,7 +159,15 @@
     return cell
   }
   const playerFactory = (name, symbol, playerHTML) => {
-    return {name, symbol}
+    const setCurrentTurn = (newTurn) => {
+      if(newTurn){
+          playerHTML.classList.add('currentTurn')
+        }else{
+          playerHTML.classList.remove('currentTurn')
+        }
+    }
+    
+    return {name, symbol, setCurrentTurn}
   }
   //IIFE
   const gameboard = (() => {
@@ -168,7 +179,16 @@
       if(players == undefined){players = initPlayers()};
       if(turnCount == 0){firstTurn = currentPlayer};
       cell.handleClaim(players[currentPlayer]);
-      currentPlayer == 0 ? currentPlayer = 1 : currentPlayer = 0;
+      
+      if (currentPlayer == 0) {
+        currentPlayer = 1
+      } else {
+        currentPlayer = 0
+      }
+
+      players[currentPlayer].setCurrentTurn(true)
+      players[1-currentPlayer].setCurrentTurn(false)
+      
       turnCount++
       if (turnCount >= 4) {
         console.log(checkWin(gameGrid, cell))
@@ -244,9 +264,9 @@
     const playerPanels = [...document.querySelectorAll('.playerpanel')]
     const players = []
     playerPanels.forEach(element => {
-      const HTML_name = element.querySelector('.playerpanel_name');
+      const HTML_name = element.querySelectorAll('.playerpanel_name');
       const HTML_symbol = element.querySelector('.playerpanel_symbol');
-      const name = HTML_name.value;
+      const name = HTML_name[0].value;
       const symbol = HTML_symbol.value;
       
       const newHTML = document.createElement('span')
@@ -256,7 +276,7 @@
 
       element.replaceWith(newHTML);
 
-      players.push(playerFactory(name, symbol, element))
+      players.push(playerFactory(name, symbol, newHTML))
     });
     return players.reverse();
   }
