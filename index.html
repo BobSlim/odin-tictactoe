@@ -174,15 +174,15 @@
       }
     }
     const checkWin = (cell) => {
-      gameGrid[x][0]
-      gameGrid[0][y]
+      gameGrid[y][0]
+      gameGrid[0][x]
 
       gameGrid[0][0]
-      gameGrid[1][1] //x=y
+      gameGrid[1][1] //y=x
       gameGrid[2][2]
 
       gameGrid[0][2]
-      gameGrid[1][1] //x=2-y
+      gameGrid[1][1] //y=2-x
       gameGrid[2][0]
     }
     const gameCells = [...document.getElementsByClassName("gamecell")].map(element => gamecellFactory(element));
