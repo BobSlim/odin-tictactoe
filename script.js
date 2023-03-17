@@ -30,26 +30,26 @@ const playerFactory = (name, symbol, playerHTML) => {
 const gameboard = (() => {
   let currentPlayer = 0;
   let players;
-  let turnCount = 0;
-  let firstTurn;
+  const turnHistory = [];
+  const gameCells = [...document.getElementsByClassName("gamecell")]
+  gameCells.map(element => gamecellFactory(element));
+  gameCells.forEach(element => {
+    element.gamecellHTML.addEventListener('click', () => playerClaim(element))
+  });
+
   const playerClaim = (cell) => {
     if(players == undefined){players = initPlayers()};
-    if(turnCount == 0){firstTurn = currentPlayer};
     cell.handleClaim(players[currentPlayer]);
     
-    if (currentPlayer == 0) {
-      currentPlayer = 1
-    } else {
-      currentPlayer = 0
-    }
+    turnHistory.push(currentPlayer)
+    currentPlayer = 1 - currentPlayer;
 
     players[currentPlayer].setCurrentTurn(true)
     players[1-currentPlayer].setCurrentTurn(false)
     
-    turnCount++
-    if (turnCount >= 4) {
+    if (turnHistory.length >= 4) {
       console.log(checkWin(gameGrid, cell))
-    } else if(turnCount == 8){
+    } else if(turnHistory.length == 8){
       console.log('draw!')
     }
   }
@@ -96,11 +96,7 @@ const gameboard = (() => {
 
   return winning;
   }
-  const gameCells = [...document.getElementsByClassName("gamecell")].map(element => gamecellFactory(element));
-  gameCells.forEach(element => {
-    element.gamecellHTML.addEventListener('click', () => playerClaim(element))
-  });
-  //IIFE
+  
   const gridifyCells = (cells) => {
     const coords = {y: 0, x: 0};
     const grid_init = [[],[],[]]
