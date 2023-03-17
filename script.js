@@ -21,6 +21,7 @@ const gamecellFactory = (gamecellHTML) => {
   return cell
 }
 const playerFactory = (name, symbol, playerHTML) => {
+  let points = 0;
   const setCurrentTurn = (newTurn) => {
     if(newTurn){
         playerHTML.classList.add('currentTurn')
@@ -28,8 +29,12 @@ const playerFactory = (name, symbol, playerHTML) => {
         playerHTML.classList.remove('currentTurn')
       }
   }
+  const addPoints = (newPoints) => {
+    points = points + newPoints;
+    playerHTML.querySelector('.points').innerText = `${points} points`
+  }
   
-  return {name, symbol, setCurrentTurn}
+  return {name, symbol, setCurrentTurn, addPoints}
 }
 //IIFE
 const gameboard = (() => {
@@ -58,10 +63,10 @@ const gameboard = (() => {
       winLine.generatedLines.forEach(element => {
         winStrokeSVG.appendChild(element)
       });
+      players[currentPlayer].addPoints(1);
       endGame()
     }else if(turnHistory.length >= 9){
       endGame()
-      console.log('draw!')
     }
 
   }
@@ -218,6 +223,11 @@ const initPlayers = () => {
     newHTML.classList.add('playerpanel_name')
     newHTML.classList.add('playerpanel')
     newHTML.innerText = `${name} - ${symbol}`
+    
+    const pointsHTML = document.createElement('span')
+    pointsHTML.classList.add('points')
+    pointsHTML.innerText = '0 points';
+    newHTML.appendChild(pointsHTML)
 
     element.replaceWith(newHTML);
 
