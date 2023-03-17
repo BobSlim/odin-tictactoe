@@ -31,8 +31,7 @@ const gameboard = (() => {
   let currentPlayer = 0;
   let players;
   const turnHistory = [];
-  const gameCells = [...document.getElementsByClassName("gamecell")]
-  gameCells.map(element => gamecellFactory(element));
+  const gameCells = [...document.getElementsByClassName("gamecell")].map(element => gamecellFactory(element));
   gameCells.forEach(element => {
     element.gamecellHTML.addEventListener('click', () => playerClaim(element))
   });
