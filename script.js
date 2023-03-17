@@ -1,5 +1,5 @@
 const gamecellFactory = (gamecellHTML) => {
-  let playerClaim = 'init';
+  let playerClaim = undefined;
   const coordinates = {
     y: 0,
     x: 0
@@ -12,7 +12,12 @@ const gamecellFactory = (gamecellHTML) => {
   const getClaim = () =>{
     return playerClaim;
   }
-  const cell = {gamecellHTML, getClaim, handleClaim}
+  const reset = () => {
+    playerClaim = undefined;
+    gamecellHTML.disabled = false;
+    gamecellHTML.innerText = '';
+  }
+  const cell = {gamecellHTML, getClaim, handleClaim, reset}
   return cell
 }
 const playerFactory = (name, symbol, playerHTML) => {
@@ -30,6 +35,7 @@ const playerFactory = (name, symbol, playerHTML) => {
 const gameboard = (() => {
   let currentPlayer = 0;
   let players;
+  const HTMLelement = document.querySelector('.gameboard')
   const winStrokeSVG = document.querySelector(".winStroke")
   const turnHistory = [];
   const gameCells = [...document.getElementsByClassName("gamecell")].map(element => gamecellFactory(element));
@@ -42,25 +48,63 @@ const gameboard = (() => {
     cell.handleClaim(players[currentPlayer]);
     
     turnHistory.push(currentPlayer)
-    currentPlayer = 1 - currentPlayer;
+    setPlayerTurn(1-currentPlayer)
 
-    players[currentPlayer].setCurrentTurn(true)
-    players[1-currentPlayer].setCurrentTurn(false)
-    
     if (turnHistory.length < 5) {return}
 
     const winLine = checkWin(gameGrid, cell)
 
-    if(!winLine && turnHistory.length >= 9){console.log('draw!')}
+    if (winLine.isWin()) {
+      winLine.generatedLines.forEach(element => {
+        winStrokeSVG.appendChild(element)
+      });
+      endGame()
+    }else if(turnHistory.length >= 9){
+      endGame()
+      console.log('draw!')
+    }
 
-    winLine.generatedLines.forEach(element => {
-      winStrokeSVG.appendChild(element)
+  }
+  const setPlayerTurn = (newPlayer) => {
+    currentPlayer = newPlayer;
+
+    players[newPlayer].setCurrentTurn(true)
+    players[1-newPlayer].setCurrentTurn(false)
+  }
+  const endGame = () => {
+    gameCells.forEach(element => {
+      element.gamecellHTML.setAttribute('disabled', 'true')
     });
+    const newGameButton = document.createElement('button');
+    newGameButton.classList.add('gameboard_newGameButton')
+    newGameButton.innerText = "Start New Game"
+    newGameButton.addEventListener("click", (event) => {resetGame(event)})
+    HTMLelement.appendChild(newGameButton);
+  }
+  const resetGame = (event) => {
+    gameCells.forEach(element => {
+      element.reset();
+    });
+    console.log(event)
+    event.srcElement.remove()
+    winStrokeSVG.innerHTML = ''
+    setPlayerTurn(1-turnHistory[0])
+    turnHistory.length = 0
   }
   const checkWin = (grid, cell) => {
     const coords = cell.coordinates
     const player = cell.getClaim()
-    const winning = {horzwin: false, vertwin: false, diagwin: false, adiagwin: false, generatedLines: []}
+    const winning = {
+      
+      wincons: {
+        horzwin: false, 
+        vertwin: false, 
+        diagwin: false, 
+        adiagwin: false
+        }, 
+      generatedLines: [],
+      isWin(){return Object.values(this.wincons).includes(true);}
+      }
 
     const lineParams = {
       startOffset: 60,
@@ -93,7 +137,7 @@ const gameboard = (() => {
         y2: lineParams.startOffset + lineParams.extraOffset*coords.y
       }
       winning.generatedLines.push(generateLine(newLineCoords))
-      winning.horzwin = true
+      winning.wincons.horzwin = true
     }
 
     vertcheck: {
@@ -108,7 +152,7 @@ const gameboard = (() => {
         y2: String(lineParams.endLine),
       }
       winning.generatedLines.push(generateLine(newLineCoords))
-      winning.vertwin = true
+      winning.wincons.vertwin = true
     }
 
     //on diag
@@ -124,7 +168,7 @@ const gameboard = (() => {
         y2: String(lineParams.endLine),
       }
       winning.generatedLines.push(generateLine(newLineCoords))
-      winning.diagwin = true;
+      winning.wincons.diagwin = true;
       }
     }
 
@@ -141,7 +185,7 @@ const gameboard = (() => {
         y2: "0"
       }
       winning.generatedLines.push(generateLine(newLineCoords))
-      winning.adiagwin = true;
+      winning.wincons.adiagwin = true;
       }
     }
   return winning;
@@ -159,7 +203,6 @@ const gameboard = (() => {
   }
 
   const gameGrid = gridifyCells(gameCells)
-  console.log(gameGrid)
 })()
 
 const initPlayers = () => {    
