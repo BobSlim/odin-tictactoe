@@ -1,58 +1,58 @@
 * {
-          box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 body {
-    margin: 0;
-    height: 100vh;
-    justify-content: center;
-    align-items: center;
-    display: flex;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: khaki;
+  margin: 0;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: khaki;
 }
 
 main {
-    width: 360px;
-    height: 800px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  width: 360px;
+  height: 800px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 h1 {
-    margin-top: 0
+  margin-top: 0
 }
 
 ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 li {
-    display: flex;
-    flex-direction: column;
-    margin: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
 }
 
 .gamepanel {
-    --symbol-size: 4rem;
-    width: 360px;
-    height: 800px;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    padding: 0.5rem;
+  --symbol-size: 4rem;
+  width: 360px;
+  height: 800px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 0.5rem;
 }
 
 .playerpanel {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
 .playerpanel_name{
@@ -71,24 +71,35 @@ li {
 }
 
 .gameboard {
-    aspect-ratio: 1 / 1;
-    --tictactoe_gapsize: 0.5rem;
-    display: grid;
-    grid-template: repeat(3, 1fr) / repeat(3, 1fr);
-    background-color: darkkhaki;
-    gap: var(--tictactoe_gapsize);
-    padding: var(--tictactoe_gapsize);
+  /* required for winstroke to render properly */
+  position: relative;
+  aspect-ratio: 1 / 1;
+  --tictactoe_gapsize: 0.5rem;
+  display: grid;
+  grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+  background-color: darkkhaki;
+  gap: var(--tictactoe_gapsize);
+  padding: var(--tictactoe_gapsize);
 }
 .gamecell {
-    border-radius: 0.5rem;
-    background-color: khaki;
-    font-size: var(--symbol-size);
-    font-weight: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  border-radius: 0.5rem;
+  background-color: khaki;
+  font-size: var(--symbol-size);
+  font-weight: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .gamecell:disabled{
   color: inherit;
+}
+
+.winStroke{
+  left: 0px;
+  top: 0px;
+  position: absolute;
+  width: 100%;
+  aspect-ratio: 1/1;
+  pointer-events: none;
 }
