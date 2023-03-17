@@ -103,3 +103,16 @@ li {
   aspect-ratio: 1/1;
   pointer-events: none;
 }
+
+.winStroke>line{
+  /* https://css-tricks.com/svg-line-animation-works/ */
+  stroke-dasharray: 500;
+  stroke-dashoffset: 500;
+  animation: dash 0.3s ease-in-out forwards;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}

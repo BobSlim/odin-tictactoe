@@ -47,13 +47,12 @@ const gameboard = (() => {
     players[currentPlayer].setCurrentTurn(true)
     players[1-currentPlayer].setCurrentTurn(false)
     
-    if (turnHistory.length < 5) {
-      return
-    }
+    if (turnHistory.length < 5) {return}
+
     const winLine = checkWin(gameGrid, cell)
-    if(!winLine && turnHistory.length >= 9){
-      console.log('draw!')
-    }
+
+    if(!winLine && turnHistory.length >= 9){console.log('draw!')}
+
     winLine.generatedLines.forEach(element => {
       winStrokeSVG.appendChild(element)
     });
@@ -130,7 +129,7 @@ const gameboard = (() => {
     }
 
     //on anti-diag
-    if(coords.y == coords.x - 2){
+    if(coords.y == 2 - coords.x){
       adiagcheck: {for (let y = 0; y < grid.length; y++) {
         const element = grid[y][2-y];
         if(element.getClaim() !== player){break adiagcheck;};
