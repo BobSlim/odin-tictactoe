@@ -30,6 +30,7 @@ const playerFactory = (name, symbol, playerHTML) => {
 const gameboard = (() => {
   let currentPlayer = 0;
   let players;
+  const winStrokeSVG = document.querySelector(".winStroke")
   const turnHistory = [];
   const gameCells = [...document.getElementsByClassName("gamecell")].map(element => gamecellFactory(element));
   gameCells.forEach(element => {
@@ -46,22 +47,53 @@ const gameboard = (() => {
     players[currentPlayer].setCurrentTurn(true)
     players[1-currentPlayer].setCurrentTurn(false)
     
-    if (turnHistory.length >= 4) {
-      console.log(checkWin(gameGrid, cell))
-    } else if(turnHistory.length == 8){
+    if (turnHistory.length < 5) {
+      return
+    }
+    const winLine = checkWin(gameGrid, cell)
+    if(!winLine && turnHistory.length >= 9){
       console.log('draw!')
     }
+    winLine.generatedLines.forEach(element => {
+      winStrokeSVG.appendChild(element)
+    });
   }
   const checkWin = (grid, cell) => {
     const coords = cell.coordinates
     const player = cell.getClaim()
-    const winning = {horzwin: false, vertwin: false, diagwin: false, adiagwin: false}
+    const winning = {horzwin: false, vertwin: false, diagwin: false, adiagwin: false, generatedLines: []}
+
+    const lineParams = {
+      startOffset: 60,
+      extraOffset: 112,
+      endLine: 344,
+      color: "black",
+      width: "10"
+    }
+
+    const generateLine = (coords) => {
+      let newLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      newLine.setAttribute("x1", coords.x1)
+      newLine.setAttribute("x2", coords.x2)
+      newLine.setAttribute("y1", coords.y1)
+      newLine.setAttribute("y2", coords.y2)
+      newLine.setAttribute("stroke", lineParams.color)
+      newLine.setAttribute("stroke-width", lineParams.width)
+      return newLine;
+    }
 
     horzcheck: {
       for (let x = 0; x < grid[coords.y].length; x++) {
         const element = grid[coords.y][x];
         if(element.getClaim() !== player){break horzcheck};
       }
+      const newLineCoords = {
+        x1: "0",
+        x2: String(lineParams.endLine),
+        y1: lineParams.startOffset + lineParams.extraOffset*coords.y,
+        y2: lineParams.startOffset + lineParams.extraOffset*coords.y
+      }
+      winning.generatedLines.push(generateLine(newLineCoords))
       winning.horzwin = true
     }
 
@@ -70,6 +102,13 @@ const gameboard = (() => {
         const element = grid[y][coords.x];
         if(element.getClaim() !== player){break vertcheck;};
       }
+      const newLineCoords = {
+        x1: lineParams.startOffset + lineParams.extraOffset*coords.x,
+        x2: lineParams.startOffset + lineParams.extraOffset*coords.x,
+        y1: "0",
+        y2: String(lineParams.endLine),
+      }
+      winning.generatedLines.push(generateLine(newLineCoords))
       winning.vertwin = true
     }
 
@@ -79,6 +118,13 @@ const gameboard = (() => {
         const element = grid[y][y];
         if(element.getClaim() !== player){break diagcheck;};
       }
+      const newLineCoords = {
+        x1: "0",
+        x2: String(lineParams.endLine),
+        y1: "0",
+        y2: String(lineParams.endLine),
+      }
+      winning.generatedLines.push(generateLine(newLineCoords))
       winning.diagwin = true;
       }
     }
@@ -89,13 +135,18 @@ const gameboard = (() => {
         const element = grid[y][2-y];
         if(element.getClaim() !== player){break adiagcheck;};
       }
+      const newLineCoords = {
+        x1: "0",
+        x2: String(lineParams.endLine),
+        y1: String(lineParams.endLine),
+        y2: "0"
+      }
+      winning.generatedLines.push(generateLine(newLineCoords))
       winning.adiagwin = true;
       }
     }
-
   return winning;
   }
-  
   const gridifyCells = (cells) => {
     const coords = {y: 0, x: 0};
     const grid_init = [[],[],[]]
