@@ -56,7 +56,7 @@ const gameboard = (() => {
   const checkWin = (grid, cell) => {
     const coords = cell.coordinates
     const player = cell.getClaim()
-    const winning = {horzwin: false, vertwin: false, diagwin: false}
+    const winning = {horzwin: false, vertwin: false, diagwin: false, adiagwin: false}
 
     horzcheck: {
       for (let x = 0; x < grid[coords.y].length; x++) {
@@ -90,7 +90,7 @@ const gameboard = (() => {
         const element = grid[y][2-y];
         if(element.getClaim() !== player){break adiagcheck;};
       }
-      winning.diagwin = true;
+      winning.adiagwin = true;
       }
     }
 
